@@ -2,10 +2,11 @@
   "name": "full-stack-e-commerce-shop",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "backend": "nodemon backend/index.js",
     "frontend": "npm run dev --prefix frontend",
-    "dev": "concurrently \"npm run frontend\" \"npm run backend"
+    "dev": "concurrently \"npm run frontend\" \"npm run backend\""
   },
   "keywords": [],
   "author": "",
