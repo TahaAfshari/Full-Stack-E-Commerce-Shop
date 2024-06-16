@@ -48,8 +48,8 @@ const loginUser = asyncHandler(async (req, res) => {
 })
 
 const logoutCurrentUser = asyncHandler(async (req, res) => {
-    res.cookie('jwt', '', {
-        httpOnly: true,
+    res.cookie("jwt", "", {
+        httyOnly: true,
         expires: new Date(0),
     })
     res.status(200).json({ message: "logout successfully" });
@@ -104,4 +104,52 @@ const updateCurrentUserProfile = asyncHandler(async (req, res) => {
     }
 });
 
-export { createUser, loginUser, logoutCurrentUser, getAllUsers, getCurrentUserProfile, updateCurrentUserProfile };
+const deleteUserById = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.params.id)
+    if (user) {
+        if (user.isAdmin) {
+            res.status(400)
+            throw new Error('cant delete admin')
+        }
+        await User.deleteOne({ _id: user._id })
+        res.json({ message: "user is deleted" })
+    }
+    else {
+        res.status(404);
+        throw new Error("user not found")
+    }
+})
+
+const getUserById = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.params.id).select('-password')
+
+    if (user) {
+        res.json(user)
+    } else {
+        res.status(404)
+        throw new Error("user not found")
+    }
+
+})
+
+const updateUserById = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.params.id)
+    if (user) {
+        user.username = req.body.username || user.username
+        user.email = req.body.email || user.emailuser
+        user.isAdmin = Boolean(req.body.isAdmin)
+
+        const updatedUser = await user.save()
+        res.json({
+            _id: updatedUser._id,
+            username: updatedUser.username,
+            email: updatedUser.email,
+            isAdmin: updatedUser.isAdmin
+        })
+
+    } else {
+        res.staus(404);
+        throw new Error("user not found")
+    }
+})
+export { createUser, loginUser, logoutCurrentUser, getAllUsers, getCurrentUserProfile, updateCurrentUserProfile, deleteUserById, getUserById, updateUserById };
